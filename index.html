@@ -119,6 +119,12 @@ tbody tr:hover{background:#FAFBFC;}
 .badge.aktif{background:var(--teal-tint);color:var(--teal-d);}
 .badge.selesai{background:#EEF0F3;color:#5B6472;}
 .badge.proses{background:var(--amber-tint);color:#9A6A0B;}
+.badge.won{background:var(--teal-tint);color:var(--teal-d);}
+.badge.lost{background:#FBE9E7;color:#C0392B;}
+.leads-summary{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px;}
+.leads-summary h3{margin:0 0 3px;font-size:15px;font-weight:700;}
+.leads-summary p{margin:0;font-size:12.5px;color:var(--muted);}
+.leads-summary b{color:var(--text);}
 .rev-cell{font-weight:700;font-variant-numeric:tabular-nums;}
 .row-actions{display:flex;gap:6px;}
 .icon-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);}
@@ -163,6 +169,10 @@ tbody tr:hover{background:#FAFBFC;}
     <a class="active" data-tab="ringkasan" href="#">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="14"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect></svg>
       Ringkasan
+    </a>
+    <a data-tab="leads" href="#">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      Leads
     </a>
     <a data-tab="klien" href="#">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -209,6 +219,17 @@ tbody tr:hover{background:#FAFBFC;}
           Tambah Klien
         </button>
       </div>
+    </div>
+
+    <div class="panel leads-summary">
+      <div>
+        <h3>Leads &amp; Konversi</h3>
+        <p>Dari <b id="ringkasanLeadsTotal">0</b> leads masuk, <b id="ringkasanWinRate">0%</b> berhasil jadi klien (<span id="ringkasanLeadsLost">0</span> gagal/tidak jadi).</p>
+      </div>
+      <button class="chip-btn" type="button" onclick="document.querySelector('#sideNav a[data-tab=leads]').click()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        Lihat Detail Leads
+      </button>
     </div>
 
     <div class="kpi-grid">
@@ -258,6 +279,58 @@ tbody tr:hover{background:#FAFBFC;}
     </div>
   </section>
 
+  <!-- ===== LEADS ===== -->
+  <section class="tab-section" id="tab-leads">
+    <div class="topbar">
+      <div><h1>Leads &amp; Konversi</h1><p>Pantau leads yang masuk, mana yang berhasil jadi klien, dan mana yang gagal/tidak jadi.</p></div>
+      <div class="topbar-actions">
+        <button class="chip-btn primary" id="btnAddClientLeads">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+          Tambah Klien / Leads
+        </button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--accent-bar:#1E2338;--icon-bg:#E9EAF0;--icon-color:#1E2338">
+        <div class="kpi-top"><div class="kpi-label">Total Leads Masuk</div>
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg></div></div>
+        <div class="kpi-value" id="leadsKpiTotal">0</div>
+        <div class="kpi-sub">seluruh leads tercatat</div>
+      </div>
+      <div class="kpi-card" style="--accent-bar:#128C7E;--icon-bg:#E3F3F0;--icon-color:#128C7E">
+        <div class="kpi-top"><div class="kpi-label">Berhasil / Klien</div>
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></svg></div></div>
+        <div class="kpi-value" id="leadsKpiWon">0</div>
+        <div class="kpi-sub">leads jadi klien &amp; uang masuk</div>
+      </div>
+      <div class="kpi-card" style="--accent-bar:#E8695F;--icon-bg:#FBE9E7;--icon-color:#C0392B">
+        <div class="kpi-top"><div class="kpi-label">Gagal / Tidak Jadi</div>
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg></div></div>
+        <div class="kpi-value" id="leadsKpiLost">0</div>
+        <div class="kpi-sub">leads tidak berlanjut</div>
+      </div>
+      <div class="kpi-card" style="--accent-bar:#F5A623;--icon-bg:#FDF0DA;--icon-color:#B67A0F">
+        <div class="kpi-top"><div class="kpi-label">Win Rate</div>
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg></div></div>
+        <div class="kpi-value" id="leadsKpiRate">0%</div>
+        <div class="kpi-sub">leads berhasil dari total masuk</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px;">
+      <div class="panel-head"><div><h3>Leads Berhasil vs Gagal per Bulan</h3><p>Perbandingan jumlah leads yang closing dan yang gagal setiap bulan</p></div></div>
+      <div class="chart-wrap tall"><canvas id="leadsMonthlyChart"></canvas></div>
+    </div>
+
+    <div class="panel table-panel">
+      <div class="panel-head">
+        <div><h3>Leads Gagal / Tidak Jadi</h3><p>Daftar leads yang tidak berhasil dikonversi, lengkap dengan alasan (jika diisi)</p></div>
+      </div>
+      <div id="lostLeadsTableWrap"></div>
+    </div>
+  </section>
+
   <!-- ===== KLIEN ===== -->
   <section class="tab-section" id="tab-klien">
     <div class="topbar">
@@ -278,8 +351,13 @@ tbody tr:hover{background:#FAFBFC;}
             <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
             <input id="searchClient" placeholder="Cari nama klien..." type="text"/>
           </div>
+          <select class="filter-select" id="filterOutcome">
+            <option value="">Semua hasil</option>
+            <option value="won">Berhasil / Klien</option>
+            <option value="lost">Gagal / Tidak Jadi</option>
+          </select>
           <select class="filter-select" id="filterStatus">
-            <option value="">Semua status</option>
+            <option value="">Semua status proyek</option>
             <option value="aktif">Aktif</option>
             <option value="proses">Onboarding</option>
             <option value="selesai">Selesai</option>
@@ -346,7 +424,7 @@ tbody tr:hover{background:#FAFBFC;}
     <p class="sub">Isi detail klien dan proyek yang ditangani.</p>
     <form id="clientForm">
       <input id="editId" type="hidden"/>
-      <div class="field"><label>Nama Klien</label><input id="fName" placeholder="Contoh: Toko Rasa Nusantara" required type="text"/></div>
+      <div class="field"><label>Nama Klien / Leads</label><input id="fName" placeholder="Contoh: Toko Rasa Nusantara" required type="text"/></div>
       <div class="field"><label>Produk / Layanan</label>
         <select id="fProduct" required>
           <option value="Website & Landing Page">Website &amp; Landing Page</option>
@@ -355,15 +433,22 @@ tbody tr:hover{background:#FAFBFC;}
           <option value="Penyediaan SDM Customer Service">Penyediaan SDM Customer Service</option>
         </select>
       </div>
-      <div class="field"><label>Bulan Mulai</label><input id="fMonth" required type="month"/></div>
-      <div class="field"><label>Revenue (Rp)</label><input id="fRevenue" min="0" placeholder="Contoh: 4500000" required type="number"/></div>
-      <div class="field"><label>Status</label>
-        <select id="fStatus" required>
+      <div class="field"><label>Hasil Leads</label>
+        <select id="fOutcome" required>
+          <option value="won">Berhasil &mdash; Jadi Klien</option>
+          <option value="lost">Gagal &mdash; Tidak Jadi</option>
+        </select>
+      </div>
+      <div class="field"><label id="fMonthLabel">Bulan Mulai</label><input id="fMonth" required type="month"/></div>
+      <div class="field" id="fieldRevenue"><label>Revenue (Rp)</label><input id="fRevenue" min="0" placeholder="Contoh: 4500000" type="number"/></div>
+      <div class="field" id="fieldStatus"><label>Status</label>
+        <select id="fStatus">
           <option value="aktif">Aktif</option>
           <option value="proses">Onboarding</option>
           <option value="selesai">Selesai</option>
         </select>
       </div>
+      <div class="field" id="fieldReason" style="display:none;"><label>Alasan Gagal (opsional)</label><input id="fReason" placeholder="Contoh: Budget tidak sesuai, pilih kompetitor, dll" type="text"/></div>
       <div class="modal-actions">
         <button class="btn-ghost" id="btnDeleteClient" style="display:none;" type="button">Hapus</button>
         <button class="btn-ghost" id="btnCancelModal" type="button">Batal</button>
@@ -384,6 +469,7 @@ const PRODUCTS = [
   { name: "Penyediaan SDM Customer Service", color: "#6FBDB3" },
 ];
 const STATUS_LABEL = { aktif: "Aktif", proses: "Onboarding", selesai: "Selesai" };
+const OUTCOME_LABEL = { won: "Berhasil", lost: "Gagal" };
 
 // --- DATA: array kosong secara default. Tambahkan klien lewat tombol "Tambah Klien",
 //     atau isi array ini langsung dengan data Anda sebelum membuka file (format sama seperti hasil Ekspor JSON).
@@ -462,6 +548,11 @@ const initials = (name) => name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0
 
 function destroyChart(key){ if(charts[key]){ charts[key].destroy(); delete charts[key]; } }
 
+// ---------- Helpers: leads outcome ----------
+const getOutcome = (c) => c.outcome === 'lost' ? 'lost' : 'won';
+const wonList = () => clients.filter(c => getOutcome(c) === 'won');
+const lostList = () => clients.filter(c => getOutcome(c) === 'lost');
+
 // ---------- TAB SWITCHING ----------
 document.querySelectorAll('#sideNav a').forEach(a=>{
   a.addEventListener('click', (e)=>{
@@ -475,16 +566,18 @@ document.querySelectorAll('#sideNav a').forEach(a=>{
 });
 
 // ---------- COMPUTE ----------
-function computeMonthly(){
+function computeMonthly(list){
+  list = list || wonList();
   const map = {};
-  clients.forEach(c=>{ map[c.month] = (map[c.month]||0) + Number(c.revenue||0); });
+  list.forEach(c=>{ map[c.month] = (map[c.month]||0) + Number(c.revenue||0); });
   const monthsSorted = Object.keys(map).sort();
   return { labels: monthsSorted.map(monthLabel), values: monthsSorted.map(m=>map[m]), raw: monthsSorted };
 }
-function computeByProduct(){
+function computeByProduct(list){
+  list = list || wonList();
   const map = {};
   PRODUCTS.forEach(p=> map[p.name] = {count:0, revenue:0});
-  clients.forEach(c=>{
+  list.forEach(c=>{
     if(!map[c.product]) map[c.product] = {count:0, revenue:0};
     map[c.product].count++;
     map[c.product].revenue += Number(c.revenue||0);
@@ -494,13 +587,21 @@ function computeByProduct(){
 
 // ---------- RENDER: KPI ----------
 function renderKPI(){
-  const uniqueClients = new Set(clients.map(c=>c.name.trim().toLowerCase()));
-  const totalRevenue = clients.reduce((s,c)=>s+Number(c.revenue||0),0);
+  const won = wonList();
+  const lost = lostList();
+  const uniqueClients = new Set(won.map(c=>c.name.trim().toLowerCase()));
+  const totalRevenue = won.reduce((s,c)=>s+Number(c.revenue||0),0);
   document.getElementById('kpiClients').textContent = uniqueClients.size;
-  document.getElementById('kpiClientsSub').textContent = uniqueClients.size + ' klien unik / ' + clients.length + ' transaksi';
+  document.getElementById('kpiClientsSub').textContent = uniqueClients.size + ' klien unik / ' + won.length + ' transaksi';
   document.getElementById('kpiRevenue').textContent = rupiah(totalRevenue);
-  document.getElementById('kpiProducts').textContent = clients.length;
-  document.getElementById('kpiAvg').textContent = clients.length ? rupiah(totalRevenue/clients.length) : 'Rp0';
+  document.getElementById('kpiProducts').textContent = won.length;
+  document.getElementById('kpiAvg').textContent = won.length ? rupiah(totalRevenue/won.length) : 'Rp0';
+
+  const totalLeads = clients.length;
+  const winRate = totalLeads ? Math.round(won.length/totalLeads*100) : 0;
+  document.getElementById('ringkasanLeadsTotal').textContent = totalLeads;
+  document.getElementById('ringkasanWinRate').textContent = winRate + '%';
+  document.getElementById('ringkasanLeadsLost').textContent = lost.length;
 }
 
 // ---------- RENDER: Ringkasan charts ----------
@@ -551,7 +652,7 @@ function renderRingkasanCharts(){
       <span class="prod-count">${counts[i]}</span>
     </div>`).join('');
 
-  const top = [...clients].sort((a,b)=>b.revenue-a.revenue).slice(0,5);
+  const top = [...wonList()].sort((a,b)=>b.revenue-a.revenue).slice(0,5);
   destroyChart('topClientChart');
   charts.topClientChart = new Chart(document.getElementById('topClientChart'), {
     type:'bar',
@@ -567,8 +668,9 @@ function renderRingkasanCharts(){
 function renderClientTable(){
   const search = (document.getElementById('searchClient').value||'').toLowerCase();
   const statusFilter = document.getElementById('filterStatus').value;
+  const outcomeFilter = document.getElementById('filterOutcome').value;
   const filtered = clients.filter(c =>
-    c.name.toLowerCase().includes(search) && (!statusFilter || c.status === statusFilter)
+    c.name.toLowerCase().includes(search) && (!statusFilter || c.status === statusFilter) && (!outcomeFilter || getOutcome(c) === outcomeFilter)
   );
   document.getElementById('klienCountLabel').textContent = clients.length + ' klien tercatat';
 
@@ -586,15 +688,16 @@ function renderClientTable(){
   }
 
   wrap.innerHTML = `<table>
-    <thead><tr><th>Klien</th><th>Produk</th><th>Bulan</th><th>Revenue</th><th>Status</th><th></th></tr></thead>
-    <tbody>${filtered.map(c=>`
+    <thead><tr><th>Klien / Leads</th><th>Produk</th><th>Bulan</th><th>Revenue</th><th>Hasil</th><th>Status Proyek</th><th></th></tr></thead>
+    <tbody>${filtered.map(c=>{ const oc = getOutcome(c); return `
       <tr>
-        <td><div class="client-cell"><div class="avatar" style="background:${productColor(c.product)}">${initials(c.name)}</div>
+        <td><div class="client-cell"><div class="avatar" style="background:${oc==='lost'?'#E8695F':productColor(c.product)}">${initials(c.name)}</div>
           <div><div class="client-name">${c.name}</div><div class="client-sub">UMKM</div></div></div></td>
         <td>${c.product}</td>
         <td>${monthLabel(c.month)}</td>
-        <td class="rev-cell">${rupiah(c.revenue)}</td>
-        <td><span class="badge ${c.status}">${STATUS_LABEL[c.status]}</span></td>
+        <td class="rev-cell">${oc==='lost' ? '&mdash;' : rupiah(c.revenue)}</td>
+        <td><span class="badge ${oc}">${OUTCOME_LABEL[oc]}</span></td>
+        <td>${oc==='lost' ? '<span style="color:var(--muted-2)">&mdash;</span>' : `<span class="badge ${c.status}">${STATUS_LABEL[c.status]}</span>`}</td>
         <td><div class="row-actions">
           <button class="icon-btn" onclick="openEdit('${c.id}')" title="Edit">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
@@ -603,7 +706,7 @@ function renderClientTable(){
             <svg fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
           </button>
         </div></td>
-      </tr>`).join('')}
+      </tr>`; }).join('')}
     </tbody></table>`;
 }
 
@@ -663,10 +766,56 @@ function renderProdukTab(){
   });
 }
 
+// ---------- RENDER: Leads tab ----------
+function renderLeadsTab(){
+  const won = wonList(), lost = lostList(), total = clients.length;
+  const winRate = total ? Math.round(won.length/total*100) : 0;
+  document.getElementById('leadsKpiTotal').textContent = total;
+  document.getElementById('leadsKpiWon').textContent = won.length;
+  document.getElementById('leadsKpiLost').textContent = lost.length;
+  document.getElementById('leadsKpiRate').textContent = winRate + '%';
+
+  const monthsSorted = [...new Set(clients.map(c=>c.month).filter(Boolean))].sort();
+  const wonByMonth = monthsSorted.map(m => clients.filter(c=>c.month===m && getOutcome(c)==='won').length);
+  const lostByMonth = monthsSorted.map(m => clients.filter(c=>c.month===m && getOutcome(c)==='lost').length);
+
+  destroyChart('leadsMonthlyChart');
+  charts.leadsMonthlyChart = new Chart(document.getElementById('leadsMonthlyChart'), {
+    type:'bar',
+    data:{ labels: monthsSorted.length?monthsSorted.map(monthLabel):['Belum ada data'],
+      datasets:[
+        { label:'Berhasil', data: monthsSorted.length?wonByMonth:[0], backgroundColor:'#128C7E', borderRadius:6, stack:'s' },
+        { label:'Gagal', data: monthsSorted.length?lostByMonth:[0], backgroundColor:'#E8695F', borderRadius:6, stack:'s' },
+      ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom', labels:{boxWidth:10, font:{size:11.5,weight:'600'}}}, tooltip:{ backgroundColor:'#1E2338', padding:10, cornerRadius:8 } },
+      scales:{ x:{grid:{display:false}, ticks:{font:{size:11}}, stacked:true}, y:{grid:{color:'#EEF0F3'}, ticks:{font:{size:11}, precision:0}, border:{display:false}, stacked:true} }
+    }
+  });
+
+  const wrap = document.getElementById('lostLeadsTableWrap');
+  if(lost.length === 0){
+    wrap.innerHTML = `<div class="empty-state"><p>Belum ada leads yang gagal/tidak jadi.</p></div>`;
+  } else {
+    wrap.innerHTML = `<table>
+      <thead><tr><th>Klien / Leads</th><th>Produk</th><th>Bulan</th><th>Alasan</th></tr></thead>
+      <tbody>${lost.map(c=>`
+        <tr>
+          <td><div class="client-cell"><div class="avatar" style="background:#E8695F">${initials(c.name)}</div>
+            <div><div class="client-name">${c.name}</div></div></div></td>
+          <td>${c.product}</td>
+          <td>${monthLabel(c.month)}</td>
+          <td>${c.reason ? c.reason : '<span style="color:var(--muted-2)">&mdash;</span>'}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  }
+}
+
 function renderAll(){
   renderKPI();
   const activeTab = document.querySelector('.tab-section.active').id;
   if(activeTab === 'tab-ringkasan') renderRingkasanCharts();
+  if(activeTab === 'tab-leads') renderLeadsTab();
   if(activeTab === 'tab-klien') renderClientTable();
   if(activeTab === 'tab-revenue') renderRevenueTab();
   if(activeTab === 'tab-produk') renderProdukTab();
@@ -675,24 +824,38 @@ function renderAll(){
 // ---------- MODAL: add/edit/delete ----------
 const overlay = document.getElementById('modalOverlay');
 const form = document.getElementById('clientForm');
+
+function updateModalFieldsVisibility(){
+  const isLost = document.getElementById('fOutcome').value === 'lost';
+  document.getElementById('fieldRevenue').style.display = isLost ? 'none' : '';
+  document.getElementById('fieldStatus').style.display = isLost ? 'none' : '';
+  document.getElementById('fieldReason').style.display = isLost ? '' : 'none';
+  document.getElementById('fMonthLabel').textContent = isLost ? 'Bulan Leads Masuk' : 'Bulan Mulai';
+}
+document.getElementById('fOutcome').addEventListener('change', updateModalFieldsVisibility);
+
 function openAdd(){
-  document.getElementById('modalTitle').textContent = 'Tambah Klien';
+  document.getElementById('modalTitle').textContent = 'Tambah Klien / Leads';
   form.reset();
   document.getElementById('editId').value = '';
   document.getElementById('btnDeleteClient').style.display = 'none';
+  updateModalFieldsVisibility();
   overlay.classList.add('open');
 }
 function openEdit(id){
   const c = clients.find(x=>x.id===id);
   if(!c) return;
-  document.getElementById('modalTitle').textContent = 'Ubah Klien';
+  document.getElementById('modalTitle').textContent = 'Ubah Klien / Leads';
   document.getElementById('editId').value = c.id;
   document.getElementById('fName').value = c.name;
   document.getElementById('fProduct').value = c.product;
+  document.getElementById('fOutcome').value = getOutcome(c);
   document.getElementById('fMonth').value = c.month;
   document.getElementById('fRevenue').value = c.revenue;
   document.getElementById('fStatus').value = c.status;
+  document.getElementById('fReason').value = c.reason || '';
   document.getElementById('btnDeleteClient').style.display = 'inline-block';
+  updateModalFieldsVisibility();
   overlay.classList.add('open');
 }
 function deleteClient(id){
@@ -703,6 +866,7 @@ function deleteClient(id){
 }
 document.getElementById('btnAddClientTop').addEventListener('click', openAdd);
 document.getElementById('btnAddClient').addEventListener('click', openAdd);
+document.getElementById('btnAddClientLeads').addEventListener('click', openAdd);
 document.getElementById('btnCancelModal').addEventListener('click', ()=>overlay.classList.remove('open'));
 document.getElementById('btnDeleteClient').addEventListener('click', ()=>{
   const id = document.getElementById('editId').value;
@@ -714,12 +878,16 @@ overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.classLis
 form.addEventListener('submit', (e)=>{
   e.preventDefault();
   const id = document.getElementById('editId').value;
+  const outcome = document.getElementById('fOutcome').value;
+  const isLost = outcome === 'lost';
   const data = {
     name: document.getElementById('fName').value.trim(),
     product: document.getElementById('fProduct').value,
+    outcome: outcome,
     month: document.getElementById('fMonth').value,
-    revenue: Number(document.getElementById('fRevenue').value),
-    status: document.getElementById('fStatus').value,
+    revenue: isLost ? 0 : Number(document.getElementById('fRevenue').value || 0),
+    status: isLost ? '' : document.getElementById('fStatus').value,
+    reason: isLost ? document.getElementById('fReason').value.trim() : '',
   };
   if(id){
     const idx = clients.findIndex(c=>c.id===id);
@@ -735,6 +903,7 @@ form.addEventListener('submit', (e)=>{
 // ---------- Search / filter ----------
 document.getElementById('searchClient').addEventListener('input', renderClientTable);
 document.getElementById('filterStatus').addEventListener('change', renderClientTable);
+document.getElementById('filterOutcome').addEventListener('change', renderClientTable);
 
 // ---------- Export / Import JSON ----------
 document.getElementById('btnExport').addEventListener('click', ()=>{
@@ -753,7 +922,7 @@ document.getElementById('fileInput').addEventListener('change', (e)=>{
     try{
       const parsed = JSON.parse(ev.target.result);
       if(Array.isArray(parsed)){
-        clients = parsed.map((c,i)=>({ id: c.id || ('c'+Date.now()+i), name:c.name||'', product:c.product||PRODUCTS[0].name, month:c.month||'', revenue:Number(c.revenue)||0, status:c.status||'aktif' }));
+        clients = parsed.map((c,i)=>({ id: c.id || ('c'+Date.now()+i), name:c.name||'', product:c.product||PRODUCTS[0].name, outcome: c.outcome==='lost'?'lost':'won', month:c.month||'', revenue:Number(c.revenue)||0, status:c.status||'aktif', reason:c.reason||'' }));
         saveToStorage();
         renderAll();
       } else { alert('Format file JSON tidak sesuai.'); }
