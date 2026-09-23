@@ -972,14 +972,8 @@ function productLabelVq(v){return ({ai_client_assistant:'AI Client Assistant',we
 async function loadVireqoOnboarding(){
   const status=document.getElementById('onboardingStatus'); status.textContent='Memuat...';
   try{
-    let r=await fetch(ONBOARDING_API,{credentials:'include'});
-    if(r.status===401){
-      const key=prompt('Masukkan Owner Access Key Vireqo (hanya sekali di browser ini):');
-      if(!key){status.textContent='Akses Client Onboarding diperlukan.';return;}
-      const login=await fetch('https://assistant.vireqo.id/admin/session',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({key})});
-      if(!login.ok) throw new Error('Owner Access Key tidak valid.');
-      r=await fetch(ONBOARDING_API,{credentials:'include'});
-    }
+    const r=await fetch(ONBOARDING_API,{credentials:'include'});
+    if(r.status===401){status.textContent='Sesi owner belum aktif. Akses dashboard owner diperlukan.';return;}
     if(!r.ok)throw new Error('API '+r.status);
     const j=await r.json(); window.vireqoOnboarding=j.submissions||[];
     status.textContent=window.vireqoOnboarding.length+' submission ditemukan.';
