@@ -968,7 +968,11 @@ const ONBOARDING_API='https://assistant.vireqo.id/admin/onboarding';
 function escVq(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function loadVireqoOnboarding(){
   let key=sessionStorage.getItem('vireqo_onboarding_admin_key')||'';
-  if(!key){key=prompt('Masukkan Vireqo Onboarding Admin Key')||'';if(!key){document.getElementById('onboardingStatus').textContent='Admin key diperlukan untuk melihat submission.';return;}sessionStorage.setItem('vireqo_onboarding_admin_key',key);}
+  if(!key && location.hash.startsWith('#vq-admin=')){
+    key=decodeURIComponent(location.hash.slice(10));
+    if(key){sessionStorage.setItem('vireqo_onboarding_admin_key',key);history.replaceState(null,'',location.pathname+location.search);}
+  }
+  if(!key){document.getElementById('onboardingStatus').textContent='Dashboard belum diotorisasi pada browser ini. Buka private admin link Vireqo sekali untuk mengaktifkan akses.';return;}
   const status=document.getElementById('onboardingStatus'); status.textContent='Memuat...';
   try{
     const r=await fetch(ONBOARDING_API,{headers:{'X-Vireqo-Admin-Key':key}});
