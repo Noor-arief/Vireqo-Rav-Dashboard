@@ -966,6 +966,7 @@ renderAll();
 
 const ONBOARDING_API='https://assistant.vireqo.id/admin/onboarding';
 function escVq(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function productLabelVq(v){return ({ai_client_assistant:'AI Client Assistant',website:'Website',web_dashboard:'Web Dashboard'})[v]||v||'-';}
 async function loadVireqoOnboarding(){
   let key=sessionStorage.getItem('vireqo_onboarding_admin_key')||'';
   if(!key && location.hash.startsWith('#vq-admin=')){
@@ -981,14 +982,20 @@ async function loadVireqoOnboarding(){
     const j=await r.json(); window.vireqoOnboarding=j.submissions||[];
     status.textContent=window.vireqoOnboarding.length+' submission ditemukan.';
     const rows=document.getElementById('onboardingRows');
-    rows.innerHTML=window.vireqoOnboarding.length?window.vireqoOnboarding.map((x,i)=>`<tr style="cursor:pointer" onclick="showVireqoOnboarding(${i})"><td><b>${escVq(x.submissionId)}</b></td><td>${escVq(x.brandName||x.businessName)}</td><td>${escVq(x.picName)}<br><span style="color:var(--muted);font-size:12px">${escVq(x.picEmail)}</span></td><td>${escVq(x.assistantName)}</td><td><span class="badge">${escVq(x.status)}</span></td><td>${escVq(x.submittedAt?new Date(x.submittedAt).toLocaleString('id-ID'):'')}</td></tr>`).join(''):'<tr><td colspan="6">Belum ada submission.</td></tr>';
+    rows.innerHTML=window.vireqoOnboarding.length?window.vireqoOnboarding.map((x,i)=>`<tr style="cursor:pointer" onclick="showVireqoOnboarding(${i})"><td><b>${escVq(x.submissionId)}</b></td><td>${escVq(x.brandName||x.businessName)}</td><td>${escVq(x.picName)}<br><span style="color:var(--muted);font-size:12px">${escVq(x.picEmail)}</span></td><td>${escVq(productLabelVq(x.productType))}</td><td><span class="badge">${escVq(x.status)}</span></td><td>${escVq(x.submittedAt?new Date(x.submittedAt).toLocaleString('id-ID'):'')}</td></tr>`).join(''):'<tr><td colspan="6">Belum ada submission.</td></tr>';
   }catch(e){status.textContent=e.message;}
 }
 function showVireqoOnboarding(i){
   const x=(window.vireqoOnboarding||[])[i]; if(!x)return;
   const d=document.getElementById('onboardingDetail'); d.style.display='block';
-  const fields=[['Business',x.businessName],['Brand',x.brandName],['Industry',x.industry],['Website',x.website],['PIC',x.picName],['WhatsApp',x.picWhatsapp],['Assistant',x.assistantName],['Assistant Role',x.assistantRole],['Language',x.language],['Tone',x.tone],['Services',x.services],['FAQ / Knowledge',x.faq],['Prohibited Topics',x.prohibitedTopics],['Name Flow',x.nameFlow],['CTA',x.cta],['Handover',x.handoverEnabled],['Handover Detail',x.handoverDetails],['Production Domains',x.productionDomains],['Staging Domains',x.stagingDomains],['Reporting Email',x.reportEmail],['Privacy URL',x.privacyUrl]];
-  d.innerHTML='<div class="panel-head"><div><h3>'+escVq(x.brandName||x.businessName)+'</h3><p>'+escVq(x.submissionId)+' · '+escVq(x.status)+'</p></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+fields.map(([k,v])=>'<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px">'+escVq(k)+'</div><div style="font-size:13px;white-space:pre-wrap">'+escVq(v||'-')+'</div></div>').join('')+'</div>';
+  const common=[['Product',productLabelVq(x.productType)],['Business',x.businessName],['Brand',x.brandName],['Industry',x.industry],['Website',x.website],['PIC',x.picName],['PIC Role',x.picRole],['PIC Email',x.picEmail],['WhatsApp',x.picWhatsapp]];
+  const ai=[['Assistant',x.assistantName],['Assistant Role',x.assistantRole],['Language',x.language],['Tone',x.tone],['Primary Color',x.primaryColor],['Avatar / Logo',x.avatarUrl],['Greeting',x.greeting],['Quick Actions',x.quickActions],['Services',x.services],['FAQ / Knowledge',x.faq],['Pricing',x.pricing],['Prohibited Topics',x.prohibitedTopics],['Approved Links',x.approvedLinks],['Name Flow',x.nameFlow],['Qualification',x.qualification],['CTA',x.cta],['Handover',x.handoverEnabled],['Handover Detail',x.handoverDetails],['Production Domains',x.productionDomains],['Staging Domains',x.stagingDomains],['Website Platform',x.websitePlatform],['Technical PIC',x.technicalPic]];
+  const website=[['Website Type',x.websiteType],['Language',x.websiteLanguage],['Goal',x.websiteGoal],['Pages',x.websitePages],['Features / Integrations',x.websiteFeatures],['CTA',x.websiteCta],['Domain',x.websiteDomain],['Hosting / Platform',x.websiteHosting],['Design References',x.websiteReferences],['Brand Assets & Content',x.websiteAssets]];
+  const dashboard=[['Dashboard Goal',x.dashboardGoal],['KPI / Metrics',x.dashboardMetrics],['Data Source',x.dashboardDataSource],['Filters / Segmentation',x.dashboardFilters],['Data Refresh',x.dashboardRefresh],['Users / Roles',x.dashboardUsers],['Export / Reporting',x.dashboardReporting],['Integrations',x.dashboardIntegrations],['Dashboard References',x.dashboardReferences]];
+  const ops=[['Operating Hours',x.operatingHours],['Reporting Email',x.reportEmail],['Report Frequency',x.reportFrequency],['Privacy URL',x.privacyUrl]];
+  const specific=x.productType==='website'?website:x.productType==='web_dashboard'?dashboard:ai;
+  const fields=[...common,...specific,...ops];
+  d.innerHTML='<div class="panel-head"><div><h3>'+escVq(x.brandName||x.businessName)+'</h3><p>'+escVq(x.submissionId)+' · '+escVq(productLabelVq(x.productType))+' · '+escVq(x.status)+'</p></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+fields.map(([k,v])=>'<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px">'+escVq(k)+'</div><div style="font-size:13px;white-space:pre-wrap">'+escVq(v||'-')+'</div></div>').join('')+'</div>';
 }
 
 const onboardingNav=document.querySelector('#sideNav a[data-tab="onboarding"]');
