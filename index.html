@@ -577,7 +577,6 @@ document.querySelectorAll('#sideNav a').forEach(a=>{
     document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
     document.getElementById('tab-' + a.dataset.tab).classList.add('active');
     renderAll();
-    if(a.dataset.tab==='onboarding') loadVireqoOnboarding();
   });
 });
 
@@ -835,6 +834,7 @@ function renderAll(){
   if(activeTab === 'tab-klien') renderClientTable();
   if(activeTab === 'tab-revenue') renderRevenueTab();
   if(activeTab === 'tab-produk') renderProdukTab();
+  if(activeTab === 'tab-onboarding' && typeof loadVireqoOnboarding === 'function') loadVireqoOnboarding();
 }
 
 // ---------- MODAL: add/edit/delete ----------
