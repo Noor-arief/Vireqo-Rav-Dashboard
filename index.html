@@ -969,6 +969,7 @@ function escVq(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'
 function productLabelVq(v){return ({ai_client_assistant:'AI Client Assistant',website:'Website',web_dashboard:'Web Dashboard'})[v]||v||'-';}
 async function loadVireqoOnboarding(){
   let key=sessionStorage.getItem('vireqo_onboarding_admin_key')||'';
+  // Owner browser can be authorized once via the private bootstrap hash; the credential is never committed here.
   if(!key && location.hash.startsWith('#vq-admin=')){
     key=decodeURIComponent(location.hash.slice(10));
     if(key){sessionStorage.setItem('vireqo_onboarding_admin_key',key);history.replaceState(null,'',location.pathname+location.search);}
