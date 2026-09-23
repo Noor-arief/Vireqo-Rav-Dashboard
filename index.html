@@ -992,6 +992,16 @@ async function loadVireqoOnboarding(){
     rows.innerHTML=window.vireqoOnboarding.length?window.vireqoOnboarding.map((x,i)=>`<tr style="cursor:pointer" onclick="showVireqoOnboarding(${i})"><td><b>${escVq(x.submissionId)}</b></td><td>${escVq(x.brandName||x.businessName)}</td><td>${escVq(x.picName)}<br><span style="color:var(--muted);font-size:12px">${escVq(x.picEmail)}</span></td><td>${escVq(productLabelVq(x.productType))}</td><td><span class="badge">${escVq(x.status)}</span></td><td>${escVq(x.submittedAt?new Date(x.submittedAt).toLocaleString('id-ID'):'')}</td></tr>`).join(''):'<tr><td colspan="6">Belum ada submission.</td></tr>';
   }catch(e){status.textContent=e.message;}
 }
+async function downloadVireqoAttachment(i,j){
+  const x=(window.vireqoOnboarding||[])[i], a=x&&Array.isArray(x.attachments)?x.attachments[j]:null;
+  if(!a||!a.url)return;
+  try{
+    const r=await fetch('https://assistant.vireqo.id'+a.url,{credentials:'include'});
+    if(!r.ok)throw new Error(r.status===401?'Sesi owner berakhir. Muat ulang Client Onboarding lalu login kembali.':'File tidak dapat diunduh (API '+r.status+').');
+    const blob=await r.blob(), url=URL.createObjectURL(blob), link=document.createElement('a');
+    link.href=url; link.download=a.name||'attachment'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(e){alert(e.message);}
+}
 function showVireqoOnboarding(i){
   const x=(window.vireqoOnboarding||[])[i]; if(!x)return;
   const d=document.getElementById('onboardingDetail'); d.style.display='block';
@@ -1003,7 +1013,7 @@ function showVireqoOnboarding(i){
   const specific=x.productType==='website'?website:x.productType==='web_dashboard'?dashboard:ai;
   const fields=[...common,...specific,...ops];
   const attachments=Array.isArray(x.attachments)?x.attachments:[];
-  const attachmentHtml=attachments.length?'<div style="grid-column:1/-1;background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:8px">ATTACHMENTS</div>'+attachments.map(a=>'<div style="font-size:13px;margin:6px 0">📎 '+escVq(a.name)+' <span style="color:var(--muted)">('+escVq(a.field)+' · '+Math.ceil(Number(a.size||0)/1024)+' KB)</span></div>').join('')+'</div>':'';
+  const attachmentHtml=attachments.length?'<div style="grid-column:1/-1;background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:8px">ATTACHMENTS</div>'+attachments.map((a,j)=>'<div style="font-size:13px;margin:6px 0">📎 <button type="button" onclick="downloadVireqoAttachment('+i+','+j+')" style="border:0;background:none;padding:0;color:#155e63;text-decoration:underline;cursor:pointer;font:inherit;font-weight:600">'+escVq(a.name)+'</button> <span style="color:var(--muted)">('+escVq(a.field)+' · '+Math.ceil(Number(a.size||0)/1024)+' KB)</span></div>').join('')+'</div>':'';
   d.innerHTML='<div class="panel-head"><div><h3>'+escVq(x.brandName||x.businessName)+'</h3><p>'+escVq(x.submissionId)+' · '+escVq(productLabelVq(x.productType))+' · '+escVq(x.status)+'</p></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+fields.map(([k,v])=>'<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px">'+escVq(k)+'</div><div style="font-size:13px;white-space:pre-wrap">'+escVq(v||'-')+'</div></div>').join('')+attachmentHtml+'</div>';
 }
 
