@@ -416,12 +416,12 @@ tbody tr:hover{background:#FAFBFC;}
   <div class="foot-note">Vireqo Business Dashboard &middot; Template siap pakai &mdash; input data klien Anda melalui tombol &ldquo;Tambah Klien&rdquo;</div>
 
   <section class="tab-section" id="tab-onboarding">
-    <div class="topbar"><div><h1>Client Onboarding</h1><p>Submission dari Vireqo AI Client Assistant onboarding form.</p></div>
+    <div class="topbar"><div><h1>Client Onboarding</h1><p>Submission dari Vireqo Client Onboarding Form.</p></div>
       
     </div>
     <div class="panel">
       <div class="panel-head"><div><h3>Submission Client</h3><p id="onboardingStatus">Masukkan admin key untuk memuat data.</p></div></div>
-      <div style="overflow:auto"><table><thead><tr><th>Submission ID</th><th>Brand</th><th>PIC</th><th>Assistant</th><th>Status</th><th>Submitted</th></tr></thead><tbody id="onboardingRows"><tr><td colspan="6" style="color:var(--muted)">Belum ada data dimuat.</td></tr></tbody></table></div>
+      <div style="overflow:auto"><table><thead><tr><th>Submission ID</th><th>Brand</th><th>PIC</th><th>Produk</th><th>Status</th><th>Submitted</th></tr></thead><tbody id="onboardingRows"><tr><td colspan="6" style="color:var(--muted)">Belum ada data dimuat.</td></tr></tbody></table></div>
     </div>
     <div class="panel" id="onboardingDetail" style="margin-top:18px;display:none"></div>
   </section>
@@ -1003,7 +1003,11 @@ function showVireqoOnboarding(i){
   d.innerHTML='<div class="panel-head"><div><h3>'+escVq(x.brandName||x.businessName)+'</h3><p>'+escVq(x.submissionId)+' · '+escVq(productLabelVq(x.productType))+' · '+escVq(x.status)+'</p></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+fields.map(([k,v])=>'<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px">'+escVq(k)+'</div><div style="font-size:13px;white-space:pre-wrap">'+escVq(v||'-')+'</div></div>').join('')+'</div>';
 }
 
-const onboardingNav=document.querySelector('#sideNav a[data-tab="onboarding"]');
+// Load onboarding immediately when an owner-authenticated dashboard opens directly on this tab,
+ // and again whenever the Client Onboarding navigation is selected.
+ const activeOnboarding=document.getElementById('tab-onboarding');
+ if(activeOnboarding?.classList.contains('active')) setTimeout(loadVireqoOnboarding,0);
+ const onboardingNav=document.querySelector('#sideNav a[data-tab="onboarding"]');
 onboardingNav?.addEventListener('click',()=>setTimeout(loadVireqoOnboarding,0));
 
 </script>
