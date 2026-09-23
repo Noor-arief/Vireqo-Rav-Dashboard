@@ -417,7 +417,7 @@ tbody tr:hover{background:#FAFBFC;}
 
   <section class="tab-section" id="tab-onboarding">
     <div class="topbar"><div><h1>Client Onboarding</h1><p>Submission dari Vireqo AI Client Assistant onboarding form.</p></div>
-      <div class="topbar-actions"><button class="chip-btn primary" id="btnLoadOnboarding">Muat Data Onboarding</button></div>
+      
     </div>
     <div class="panel">
       <div class="panel-head"><div><h3>Submission Client</h3><p id="onboardingStatus">Masukkan admin key untuk memuat data.</p></div></div>
@@ -968,11 +968,11 @@ const ONBOARDING_API='https://assistant.vireqo.id/admin/onboarding';
 function escVq(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function loadVireqoOnboarding(){
   let key=sessionStorage.getItem('vireqo_onboarding_admin_key')||'';
-  if(!key){key=prompt('Masukkan Vireqo Onboarding Admin Key')||'';if(!key)return;sessionStorage.setItem('vireqo_onboarding_admin_key',key);}
+  if(!key){key=prompt('Masukkan Vireqo Onboarding Admin Key')||'';if(!key){document.getElementById('onboardingStatus').textContent='Admin key diperlukan untuk melihat submission.';return;}sessionStorage.setItem('vireqo_onboarding_admin_key',key);}
   const status=document.getElementById('onboardingStatus'); status.textContent='Memuat...';
   try{
     const r=await fetch(ONBOARDING_API,{headers:{'X-Vireqo-Admin-Key':key}});
-    if(r.status===401){sessionStorage.removeItem('vireqo_onboarding_admin_key');throw new Error('Admin key tidak valid. Klik Muat Data Onboarding untuk coba lagi.');}
+    if(r.status===401){sessionStorage.removeItem('vireqo_onboarding_admin_key');throw new Error('Admin key tidak valid. Buka ulang menu Client Onboarding untuk mencoba lagi.');}
     if(!r.ok)throw new Error('API '+r.status);
     const j=await r.json(); window.vireqoOnboarding=j.submissions||[];
     status.textContent=window.vireqoOnboarding.length+' submission ditemukan.';
@@ -986,7 +986,10 @@ function showVireqoOnboarding(i){
   const fields=[['Business',x.businessName],['Brand',x.brandName],['Industry',x.industry],['Website',x.website],['PIC',x.picName],['WhatsApp',x.picWhatsapp],['Assistant',x.assistantName],['Assistant Role',x.assistantRole],['Language',x.language],['Tone',x.tone],['Services',x.services],['FAQ / Knowledge',x.faq],['Prohibited Topics',x.prohibitedTopics],['Name Flow',x.nameFlow],['CTA',x.cta],['Handover',x.handoverEnabled],['Handover Detail',x.handoverDetails],['Production Domains',x.productionDomains],['Staging Domains',x.stagingDomains],['Reporting Email',x.reportEmail],['Privacy URL',x.privacyUrl]];
   d.innerHTML='<div class="panel-head"><div><h3>'+escVq(x.brandName||x.businessName)+'</h3><p>'+escVq(x.submissionId)+' · '+escVq(x.status)+'</p></div></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">'+fields.map(([k,v])=>'<div style="background:#FAFBFC;border:1px solid var(--border);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:5px">'+escVq(k)+'</div><div style="font-size:13px;white-space:pre-wrap">'+escVq(v||'-')+'</div></div>').join('')+'</div>';
 }
-document.getElementById('btnLoadOnboarding')?.addEventListener('click',loadVireqoOnboarding);
+
+const onboardingNav=document.querySelector('#sideNav a[data-tab="onboarding"]');
+onboardingNav?.addEventListener('click',()=>setTimeout(loadVireqoOnboarding,0));
+
 </script>
 </body>
 </html>
