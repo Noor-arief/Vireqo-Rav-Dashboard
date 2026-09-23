@@ -966,11 +966,7 @@ loadFromStorage();
 renderAll();
 
 const ONBOARDING_API='https://assistant.vireqo.id/admin/onboarding';
-const VIREQO_OWNER_BOOTSTRAP='vqadm_9f4c71b8d2e65a30c8471f9b63e2a5847d10c5e8';
-if(!localStorage.getItem('vireqo_onboarding_admin_key')){
-  localStorage.setItem('vireqo_onboarding_admin_key',VIREQO_OWNER_BOOTSTRAP);
-  sessionStorage.setItem('vireqo_onboarding_admin_key',VIREQO_OWNER_BOOTSTRAP);
-}
+
 function escVq(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function productLabelVq(v){return ({ai_client_assistant:'AI Client Assistant',website:'Website',web_dashboard:'Web Dashboard'})[v]||v||'-';}
 async function loadVireqoOnboarding(){
