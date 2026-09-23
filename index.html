@@ -577,6 +577,7 @@ document.querySelectorAll('#sideNav a').forEach(a=>{
     document.querySelectorAll('.tab-section').forEach(s=>s.classList.remove('active'));
     document.getElementById('tab-' + a.dataset.tab).classList.add('active');
     renderAll();
+    if(a.dataset.tab==='onboarding') loadVireqoOnboarding();
   });
 });
 
@@ -1007,8 +1008,7 @@ function showVireqoOnboarding(i){
  // and again whenever the Client Onboarding navigation is selected.
  const activeOnboarding=document.getElementById('tab-onboarding');
  if(activeOnboarding?.classList.contains('active')) setTimeout(loadVireqoOnboarding,0);
- const onboardingNav=document.querySelector('#sideNav a[data-tab="onboarding"]');
-onboardingNav?.addEventListener('click',()=>setTimeout(loadVireqoOnboarding,0));
+ // Onboarding loading is handled directly by the main tab switch above.
 
 </script>
 </body>
